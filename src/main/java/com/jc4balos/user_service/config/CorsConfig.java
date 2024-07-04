@@ -1,4 +1,4 @@
-package com.jc4balos.logging_service.config;
+package com.jc4balos.user_service.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;

@@ -1,4 +1,4 @@
-package com.jc4balos.logging_service.exception;
+package com.jc4balos.user_service.exception;
 
 import java.util.HashMap;
 import java.util.List;
