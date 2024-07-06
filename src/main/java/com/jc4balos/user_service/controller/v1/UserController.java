@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
-    @PostMapping("/add")
+    @PostMapping("/create")
     public ResponseEntity<?> createUser(NewUserDto newUserDto, BindingResult bindingResult) {
         try {
             if (!bindingResult.hasErrors()) {
