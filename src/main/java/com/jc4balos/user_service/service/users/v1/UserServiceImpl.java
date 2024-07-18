@@ -2,6 +2,9 @@ package com.jc4balos.user_service.service.users.v1;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jc4balos.user_service.dto.user.NewUserDto;
@@ -9,7 +12,6 @@ import com.jc4balos.user_service.mapper.user_mapper.UserMapper;
 import com.jc4balos.user_service.model.User;
 import com.jc4balos.user_service.repository.UserRepository;
 
-import ch.qos.logback.classic.Logger;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -19,9 +21,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Autowired
     private UserMapper userMapper;
 
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     @Transactional

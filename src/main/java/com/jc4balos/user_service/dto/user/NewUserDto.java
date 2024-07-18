@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -23,9 +24,11 @@ public class NewUserDto {
     private String husbandSurname;
 
     @NotEmpty(message = "Username is required.")
+    @Min(value = 4, message = "Username must be at least 8 characters.")
     private String username;
 
     @NotEmpty(message = "Password is required.")
+    @Min(value = 8, message = "Password must be at least 8 characters.")
     private String password;
 
     @NotEmpty(message = "Email is required.")

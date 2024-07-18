@@ -1,5 +1,6 @@
 package com.jc4balos.user_service.controller.v1;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
+    @Autowired
     private UserService userService;
 
     @PostMapping("/create")
