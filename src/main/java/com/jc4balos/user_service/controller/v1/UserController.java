@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
+import com.jc4balos.user_service.service.users.v1.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,11 +18,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
+    private UserService userService;
+
     @PostMapping("/create")
     public ResponseEntity<?> createUser(NewUserDto newUserDto, BindingResult bindingResult) {
         try {
             if (!bindingResult.hasErrors()) {
-                return new ResponseEntity<>(/* TODO: insert create user service here */
+                return new ResponseEntity<>(userService.createUser(newUserDto),
                         HttpStatus.OK);
             } else {
                 return ApplicationExceptionHandler.handleBadRequest(bindingResult);
