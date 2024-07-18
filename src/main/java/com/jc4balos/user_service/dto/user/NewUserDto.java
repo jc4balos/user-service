@@ -1,5 +1,7 @@
 package com.jc4balos.user_service.dto.user;
 
+import java.time.LocalDate;
+
 import org.springframework.stereotype.Component;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -29,9 +31,12 @@ public class NewUserDto {
     @NotEmpty(message = "Email is required.")
     private String email;
 
-    private String address_line_1;
+    @NotEmpty(message = "Sex is required.")
+    private String sex;
 
-    private String address_line_2;
+    private String addressLine1;
+
+    private String addressLine2;
 
     @NotNull(message = "Baranggay is required.")
     private Long addressBrgyId;
@@ -47,5 +52,8 @@ public class NewUserDto {
 
     @NotNull(message = "Contact Number is required.")
     private String contactNumber;
+
+    @NotNull(message = "Birthdate is required.")
+    private LocalDate birthDate;
 
 }
