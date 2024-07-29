@@ -24,8 +24,8 @@ public class UserMapper {
         user.setAddressRegionId(newUserDto.getAddressRegionId());
         user.setAddressLine1(newUserDto.getAddressLine1());
         user.setAddressLine2(newUserDto.getAddressLine2());
-        user.setEmail(StringHasher.hashString(newUserDto.getEmail()));
-        user.setPassword(StringHasher.hashString(newUserDto.getPassword()));
+        user.setEmail(newUserDto.getEmail());
+        user.setPassword(StringHasher.hashString(newUserDto.getPassword(), newUserDto.getEmail()));
         user.setIsActive(true);
         return user;
     }

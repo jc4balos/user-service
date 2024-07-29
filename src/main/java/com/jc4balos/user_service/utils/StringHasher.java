@@ -1,24 +1,30 @@
 package com.jc4balos.user_service.utils;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class StringHasher {
 
-    public static String hashString(String string) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(string);
+    public static String hashString(String string, String salt) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            String concatedString = string + salt;
+            byte[] hashedBytes = messageDigest.digest(concatedString.getBytes());
+            return bytesToHex(hashedBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Password Encryption Error");
+        }
     }
 
-    /*
-     * @param rawString - the raw string to be checked
-     * 
-     * @param hashedString - the hashed string to be compared
-     * 
-     * @return boolean - true if the raw string matches the hashed string, false
-     * otherwise
-     */
-    public static boolean checkString(String rawString, String hashedString) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.matches(rawString, hashedString);
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1)
+                hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
+
 }
