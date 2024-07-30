@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Map<String, String> createUser(NewUserDto newUserDto) {
+        System.out.println(newUserDto.toString());
         User newUser = userMapper.newUserDto(newUserDto);
         userRepository.save(newUser);
         String message = "User " + newUser.getUsername() + " created successfully.";

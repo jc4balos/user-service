@@ -18,7 +18,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "logs", indexes = {
+@Table(name = "users", indexes = {
 
 })
 @Builder

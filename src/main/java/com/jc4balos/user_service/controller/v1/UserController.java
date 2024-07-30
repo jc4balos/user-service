@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,12 +24,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(NewUserDto newUserDto, BindingResult bindingResult) {
+    public ResponseEntity<?> createUser(@RequestBody NewUserDto newUserDto, BindingResult bindingResult) {
         try {
             if (!bindingResult.hasErrors()) {
                 return new ResponseEntity<>(userService.createUser(newUserDto),
                         HttpStatus.OK);
             } else {
+                // TODO: make this work again
                 return ApplicationExceptionHandler.handleBadRequest(bindingResult);
             }
         } catch (Exception e) {

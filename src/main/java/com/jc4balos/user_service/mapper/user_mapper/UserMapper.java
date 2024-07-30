@@ -17,6 +17,7 @@ public class UserMapper {
         user.setHusbandSurname(newUserDto.getHusbandSurname());
         user.setBirthDate(newUserDto.getBirthDate());
         user.setSex(newUserDto.getSex());
+        user.setUsername(newUserDto.getUsername());
         user.setContactNumber(newUserDto.getContactNumber());
         user.setAddressBrgyId(newUserDto.getAddressBrgyId());
         user.setAddressCityId(newUserDto.getAddressCityId());
