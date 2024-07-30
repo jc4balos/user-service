@@ -3,6 +3,7 @@ package com.jc4balos.user_service.mapper.user_mapper;
 import org.springframework.stereotype.Component;
 
 import com.jc4balos.user_service.dto.user.NewUserDto;
+import com.jc4balos.user_service.dto.user.ViewUserDto;
 import com.jc4balos.user_service.model.User;
 import com.jc4balos.user_service.utils.StringHasher;
 
@@ -29,6 +30,12 @@ public class UserMapper {
         user.setPassword(StringHasher.hashString(newUserDto.getPassword(), newUserDto.getEmail()));
         user.setIsActive(true);
         return user;
+    }
+
+    public ViewUserDto viewUserDto(User user) {
+        ViewUserDto viewUserDto = new ViewUserDto();
+        // TODO: implement mapper of viewUserDTO here
+        return null;
     }
 
 }

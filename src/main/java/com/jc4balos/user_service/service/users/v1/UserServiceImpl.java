@@ -1,13 +1,18 @@
 package com.jc4balos.user_service.service.users.v1;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.jc4balos.user_service.dto.user.NewUserDto;
+import com.jc4balos.user_service.dto.user.ViewUserDto;
 import com.jc4balos.user_service.mapper.user_mapper.UserMapper;
 import com.jc4balos.user_service.model.User;
 import com.jc4balos.user_service.repository.UserRepository;
@@ -29,7 +34,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Map<String, String> createUser(NewUserDto newUserDto) {
-        System.out.println(newUserDto.toString());
         User newUser = userMapper.newUserDto(newUserDto);
         userRepository.save(newUser);
         String message = "User " + newUser.getUsername() + " created successfully.";
@@ -37,4 +41,24 @@ public class UserServiceImpl implements UserService {
         return Map.of("message", message);
     }
 
+    @Override
+    public List<ViewUserDto> getAllUsers(int pageNumber, int itemsPerPage, String searchParam, String sortBy,
+            String order) {
+        // TODO: implement getAllUsers service\
+        Sort sort;
+
+        if (order == "ASCENDING") {
+            sort = Sort.by(sortBy).ascending();
+        } else if (order == "DESCENDING") {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            String message = "Cannot fetch users. Unknown sorting order.";
+            logger.error(message);
+            throw new RuntimeException(message);
+        }
+
+        PageRequest pageAndSort = PageRequest.of(pageNumber, itemsPerPage, sort);
+        Page<User> users = userRepository.findAll(pageAndSort);
+
+    }
 }
