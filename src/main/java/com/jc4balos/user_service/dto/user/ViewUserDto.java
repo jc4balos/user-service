@@ -31,13 +31,7 @@ public class ViewUserDto {
 
     private String addressLine2;
 
-    private Long addressBrgyId;
-
-    private Long addressCityId;
-
-    private Long addressProvinceId;
-
-    private Long addressRegionId;
+    private String addressLine3;
 
     private String contactNumber;
 

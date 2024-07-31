@@ -22,12 +22,9 @@ public class UserMapper {
         user.setSex(newUserDto.getSex());
         user.setUsername(newUserDto.getUsername());
         user.setContactNumber(newUserDto.getContactNumber());
-        user.setAddressBrgyId(newUserDto.getAddressBrgyId());
-        user.setAddressCityId(newUserDto.getAddressCityId());
-        user.setAddressProvinceId(newUserDto.getAddressProvinceId());
-        user.setAddressRegionId(newUserDto.getAddressRegionId());
         user.setAddressLine1(newUserDto.getAddressLine1());
         user.setAddressLine2(newUserDto.getAddressLine2());
+        user.setAddressLine3(newUserDto.getAddressLine3());
         user.setEmail(newUserDto.getEmail());
         user.setPassword(StringHasher.hashString(newUserDto.getPassword(), newUserDto.getEmail()));
         user.setIsActive(true);
@@ -36,12 +33,9 @@ public class UserMapper {
 
     public ViewUserDto viewUserDto(User user) {
         ViewUserDto viewUserDto = new ViewUserDto();
-        viewUserDto.setAddressBrgyId(user.getAddressBrgyId());
-        viewUserDto.setAddressCityId(user.getAddressCityId());
         viewUserDto.setAddressLine1(user.getAddressLine1());
         viewUserDto.setAddressLine2(user.getAddressLine2());
-        viewUserDto.setAddressProvinceId(user.getAddressProvinceId());
-        viewUserDto.setAddressRegionId(user.getAddressRegionId());
+        viewUserDto.setAddressLine3(user.getAddressLine3());
         viewUserDto.setBirthDate(user.getBirthDate());
         viewUserDto.setContactNumber(user.getContactNumber());
         viewUserDto.setEmail(user.getEmail());

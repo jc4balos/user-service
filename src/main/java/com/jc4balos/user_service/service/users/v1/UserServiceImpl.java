@@ -37,6 +37,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Map<String, String> createUser(NewUserDto newUserDto) {
         User newUser = userMapper.newUserDto(newUserDto);
+
+        // TODO: make a guard clause for duplicate usernames and return username already
+        // e
+
         userRepository.save(newUser);
         String message = "User " + newUser.getUsername() + " created successfully.";
         logger.info(message);

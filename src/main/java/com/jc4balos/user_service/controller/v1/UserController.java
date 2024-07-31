@@ -15,6 +15,7 @@ import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
 import com.jc4balos.user_service.service.users.v1.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -32,7 +33,7 @@ public class UserController {
      */
 
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@RequestBody NewUserDto newUserDto, BindingResult bindingResult) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody NewUserDto newUserDto, BindingResult bindingResult) {
         try {
             if (!bindingResult.hasErrors()) {
                 return new ResponseEntity<>(userService.createUser(newUserDto),

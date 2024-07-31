@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users", indexes = {
-
+        @Index(name = "username_index", columnList = "username"),
 })
 @Builder
 @AllArgsConstructor
@@ -59,17 +60,8 @@ public class User {
     @Column(nullable = true, length = 256, name = "address_line_2")
     private String addressLine2;
 
-    @Column(nullable = false, name = "address_brgy_id")
-    private Long addressBrgyId;
-
-    @Column(nullable = false, name = "address_city_id")
-    private Long addressCityId;
-
-    @Column(nullable = false, name = "address_province_id")
-    private Long addressProvinceId;
-
-    @Column(nullable = false, name = "address_region_id")
-    private Long addressRegionId;
+    @Column(nullable = true, length = 256, name = "address_line_3")
+    private String addressLine3;
 
     @Column(nullable = false, length = 16, name = "contact_number")
     private String contactNumber;
