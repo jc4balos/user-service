@@ -1,5 +1,6 @@
 package com.jc4balos.user_service.service.users.v1;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,14 +44,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<ViewUserDto> getAllUsers(int pageNumber, int itemsPerPage, String searchParam, String sortBy,
+    public Map<String, Object> getAllUsers(int pageIndex, int itemsPerPage, String searchParam, String sortBy,
             String order) {
-        // TODO: implement getAllUsers service\
+
+        List<ViewUserDto> viewUserDtos = new ArrayList<>();
         Sort sort;
 
-        if (order == "ASCENDING") {
+        System.out.println("SORTING ORDER: " + order);
+
+        if (order.equals("ASCENDING")) {
             sort = Sort.by(sortBy).ascending();
-        } else if (order == "DESCENDING") {
+        } else if (order.equals("DESCENDING")) {
             sort = Sort.by(sortBy).descending();
         } else {
             String message = "Cannot fetch users. Unknown sorting order.";
@@ -58,10 +62,18 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(message);
         }
 
-        Pageable pageAndSort = PageRequest.of(pageNumber, itemsPerPage, sort);
+        Pageable pageAndSort = PageRequest.of(pageIndex, itemsPerPage, sort);
         Page<User> users = userRepository.findBySearchParam(searchParam, pageAndSort);
 
-        // TODO: map users to dto for security
-        return null;
+        for (User user : users) {
+            ViewUserDto mappedUser = userMapper.viewUserDto(user);
+            viewUserDtos.add(mappedUser);
+        }
+
+        Map<String, Object> response = Map.of("pageIndex", users.getNumber(),
+                "totalPages", users.getTotalPages(),
+                "users", viewUserDtos);
+
+        return response;
     }
 }

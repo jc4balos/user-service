@@ -2,18 +2,13 @@ package com.jc4balos.user_service.dto.user;
 
 import java.time.LocalDate;
 
-import org.springframework.stereotype.Component;
-
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Data;
 
-@Component
 @Data
 @Builder
 public class NewUserDto {
 
-    @NotEmpty
     private String firstName;
 
     private String motherSurname;

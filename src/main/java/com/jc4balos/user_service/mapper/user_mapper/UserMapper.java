@@ -10,6 +10,8 @@ import com.jc4balos.user_service.utils.StringHasher;
 @Component
 public class UserMapper {
 
+    // TODO: use builder for better readability
+
     public User newUserDto(NewUserDto newUserDto) {
         User user = new User();
         user.setFirstName(newUserDto.getFirstName());
@@ -34,8 +36,23 @@ public class UserMapper {
 
     public ViewUserDto viewUserDto(User user) {
         ViewUserDto viewUserDto = new ViewUserDto();
-        // TODO: implement mapper of viewUserDTO here
-        return null;
+        viewUserDto.setAddressBrgyId(user.getAddressBrgyId());
+        viewUserDto.setAddressCityId(user.getAddressCityId());
+        viewUserDto.setAddressLine1(user.getAddressLine1());
+        viewUserDto.setAddressLine2(user.getAddressLine2());
+        viewUserDto.setAddressProvinceId(user.getAddressProvinceId());
+        viewUserDto.setAddressRegionId(user.getAddressRegionId());
+        viewUserDto.setBirthDate(user.getBirthDate());
+        viewUserDto.setContactNumber(user.getContactNumber());
+        viewUserDto.setEmail(user.getEmail());
+        viewUserDto.setFatherSurname(user.getFatherSurname());
+        viewUserDto.setFirstName(user.getFirstName());
+        viewUserDto.setHusbandSurname(user.getHusbandSurname());
+        viewUserDto.setMotherSurname(user.getMotherSurname());
+        viewUserDto.setSex(user.getSex());
+        viewUserDto.setUserId(user.getUserId());
+        viewUserDto.setUsername(user.getUsername());
+        return viewUserDto;
     }
 
 }

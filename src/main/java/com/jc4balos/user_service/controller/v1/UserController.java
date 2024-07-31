@@ -25,6 +25,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * @param newUserDto
+     * @param bindingResult
+     * @return
+     */
+
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody NewUserDto newUserDto, BindingResult bindingResult) {
         try {
@@ -40,12 +46,22 @@ public class UserController {
 
     }
 
+    /**
+     * @param pageIndex    page index of the users to get
+     * @param itemsPerPage the number of records to be returned per page
+     * @param searchParam  string that will match when searchng the records
+     * @param sortBy       string from the database column name. The response will
+     *                     be sorted by this.
+     * @param order        sorting mechanism ("ASCENDING", "DESCENDING")
+     */
+
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllUsers(@RequestParam int pageNumber, @RequestParam int itemsPerPage,
-            @RequestParam String searchParam) {
+    public ResponseEntity<?> getAllUsers(@RequestParam int pageIndex, @RequestParam int itemsPerPage,
+            @RequestParam String searchParam, @RequestParam String sortBy, @RequestParam String order) {
         try {
 
-            return new ResponseEntity<>(// TODO: insert service here,
+            return new ResponseEntity<>(
+                    userService.getAllUsers(pageIndex, itemsPerPage, searchParam, sortBy, order),
                     HttpStatus.OK);
 
         } catch (Exception e) {

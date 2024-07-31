@@ -2,14 +2,15 @@ package com.jc4balos.user_service.dto.user;
 
 import java.time.LocalDate;
 
-import org.springframework.stereotype.Component;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Component
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ViewUserDto {
 
     private Long userId;
