@@ -36,7 +36,7 @@ public class ModifyUserInfoDto {
     @NotNull(message = "Birthdate is required.")
     private LocalDate birthDate;
 
-    @NotEmpty(message = "Sex is required.")
+    @NotNull(message = "Sex is required.")
     private UserSex sex;
 
 }

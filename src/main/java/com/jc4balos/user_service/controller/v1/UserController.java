@@ -98,10 +98,10 @@ public class UserController {
         }
     }
 
-    // @PatchMapping("/change-email/{userId}")
+    // TODO: @PatchMapping("/change-email/{userId}")
 
-    // @PatchMapping("/change-password/{userId}")
+    // TODO: @PatchMapping("/change-password/{userId}")
 
-    // @PatchMapping("/change-contact-number/{userId}")
+    // TODO: @PatchMapping("/change-contact-number/{userId}")
 
 }

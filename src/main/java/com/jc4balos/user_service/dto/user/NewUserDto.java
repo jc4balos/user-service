@@ -2,6 +2,8 @@ package com.jc4balos.user_service.dto.user;
 
 import java.time.LocalDate;
 
+import com.jc4balos.user_service.values.UserSex;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +14,7 @@ import lombok.Data;
 @Builder
 public class NewUserDto {
 
-    @NotNull(message = "First name is required.")
+    @NotEmpty(message = "First name is required.")
     private String firstName;
 
     private String motherSurname;
@@ -44,7 +46,7 @@ public class NewUserDto {
     @NotNull(message = "Birthdate is required.")
     private LocalDate birthDate;
 
-    @NotEmpty(message = "Sex is required.")
-    private String sex;
+    @NotNull(message = "Sex is required.")
+    private UserSex sex;
 
 }
