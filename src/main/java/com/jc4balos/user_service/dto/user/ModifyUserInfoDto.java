@@ -2,6 +2,8 @@ package com.jc4balos.user_service.dto.user;
 
 import java.time.LocalDate;
 
+import com.jc4balos.user_service.values.UserSex;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -35,6 +37,6 @@ public class ModifyUserInfoDto {
     private LocalDate birthDate;
 
     @NotEmpty(message = "Sex is required.")
-    private String sex;
+    private UserSex sex;
 
 }

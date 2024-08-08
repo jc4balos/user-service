@@ -2,6 +2,8 @@ package com.jc4balos.user_service.dto.user;
 
 import java.time.LocalDate;
 
+import com.jc4balos.user_service.values.UserSex;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,6 +39,6 @@ public class ViewUserDto {
 
     private LocalDate birthDate;
 
-    private String sex;
+    private UserSex sex;
 
 }
