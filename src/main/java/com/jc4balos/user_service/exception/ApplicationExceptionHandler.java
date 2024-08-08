@@ -36,7 +36,7 @@ public class ApplicationExceptionHandler {
         List<String> errors = bindingResult.getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(Map.of("messages", errors), HttpStatus.BAD_REQUEST);
     }
 
     public static ResponseEntity<?> handleCustomException(Exception e) {

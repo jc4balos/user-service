@@ -12,7 +12,6 @@ import lombok.Data;
 @Builder
 public class NewUserDto {
 
-    // TODO: add validation
     @NotNull(message = "First name is required.")
     private String firstName;
 

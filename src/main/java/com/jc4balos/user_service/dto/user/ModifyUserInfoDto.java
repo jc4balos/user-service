@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ModifyUserInfoDto {
 
-    @NotNull(message = "First name is required.")
+    @NotEmpty(message = "First name is required.")
     private String firstName;
 
     private String motherSurname;

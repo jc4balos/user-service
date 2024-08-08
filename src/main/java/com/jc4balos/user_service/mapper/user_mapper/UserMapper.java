@@ -54,6 +54,13 @@ public class UserMapper {
         currentUser.setAddressLine1(modifyUserDto.getAddressLine1());
         currentUser.setAddressLine2(modifyUserDto.getAddressLine2());
         currentUser.setAddressLine3(modifyUserDto.getAddressLine3());
+        currentUser.setBirthDate(modifyUserDto.getBirthDate());
+        currentUser.setFatherSurname(modifyUserDto.getFatherSurname());
+        currentUser.setFirstName(modifyUserDto.getFirstName());
+        currentUser.setMotherSurname(modifyUserDto.getMotherSurname());
+        currentUser.setHusbandSurname(modifyUserDto.getHusbandSurname());
+        currentUser.setSex(modifyUserDto.getSex());
+        return currentUser;
     }
 
 }
