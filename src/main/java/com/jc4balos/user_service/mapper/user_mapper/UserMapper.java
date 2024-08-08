@@ -2,6 +2,7 @@ package com.jc4balos.user_service.mapper.user_mapper;
 
 import org.springframework.stereotype.Component;
 
+import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.dto.user.ViewUserDto;
 import com.jc4balos.user_service.model.User;
@@ -47,6 +48,12 @@ public class UserMapper {
         viewUserDto.setUserId(user.getUserId());
         viewUserDto.setUsername(user.getUsername());
         return viewUserDto;
+    }
+
+    public User modifyUserInfoDto(ModifyUserInfoDto modifyUserDto, User currentUser) {
+        currentUser.setAddressLine1(modifyUserDto.getAddressLine1());
+        currentUser.setAddressLine2(modifyUserDto.getAddressLine2());
+        currentUser.setAddressLine3(modifyUserDto.getAddressLine3());
     }
 
 }
