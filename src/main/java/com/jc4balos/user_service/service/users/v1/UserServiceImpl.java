@@ -3,6 +3,7 @@ package com.jc4balos.user_service.service.users.v1;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.dto.user.ViewUserDto;
 import com.jc4balos.user_service.mapper.user_mapper.UserMapper;
@@ -80,4 +82,16 @@ public class UserServiceImpl implements UserService {
 
         return response;
     }
+
+    @Override
+    @Transactional
+    public Map<String, String> modifyUserInfo(Long userId, ModifyUserInfoDto modifyUserInfoDto) {
+        Optional<User> userToBeModified = Optional.of(userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User doesn't exist")));
+
+        User modifiedUser = userMapper.modifyUserInfoDto(modifyUserInfoDto, userToBeModified.get());
+        userRepository.save(modifiedUser);
+        return Map.of("message", modifiedUser.getUsername() + " successfully modified.");
+    }
+
 }
