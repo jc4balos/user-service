@@ -172,4 +172,8 @@ sudo docker compose -f docker-compose-service-only.yaml up --build
 
 ```
 
+# API Endpoints
+
+Go to https://voltesiv.postman.co/workspace/954c2fe7-c7cc-4b73-9ea5-8fda4e20efd7 to see test API Endpoints.
+
 Stay tuned for futher updates!
