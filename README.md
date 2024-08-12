@@ -90,7 +90,7 @@ To run this project, you will need to add the following environment variables to
 
   **Example:** `8080`
 
-## Run Locally
+## Run Locally (Development)
 
 Clone the project
 
@@ -104,6 +104,13 @@ Go to the project directory
   cd my-project
 ```
 
+Set `src/main/resources/application.properties` to this:
+
+```
+spring.profiles.active=dev
+
+```
+
 Clean and compile via maven
 
 ```
@@ -115,7 +122,7 @@ See https://mariadb.com/kb/en/getting-installing-and-upgrading-mariadb/ for more
 
 Run the Spring application
 
-## Deployment
+## Deployment along with mariadb container
 
 Follow this steps to deploy the project on your server
 
@@ -137,6 +144,31 @@ mvn clean package -Dmaven.test.skip=true
 
 ```
 sudo docker compose -f docker-compose.yaml up --build
+
+```
+
+## Deployment with User Service container only
+
+Follow this steps to deploy the project on your server
+
+1. Set application.properties into this:
+
+```
+spring.profiles.active=prod
+
+```
+
+2. Run this on project directory
+
+```
+mvn clean package -Dmaven.test.skip=true
+
+```
+
+3. Run this to create and deploy containers
+
+```
+sudo docker compose -f docker-compose-service-only.yaml up --build
 
 ```
 
