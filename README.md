@@ -70,7 +70,7 @@ To run this project, you will need to add the following environment variables to
 
   **Example:** `root_dev`
 
-- `MARIADB_PORT=3306`
+- `MARIADB_PORT`
 
   **Description:** Port that mariadb will run inside the mariadb container
 
@@ -84,7 +84,7 @@ To run this project, you will need to add the following environment variables to
 
   **Example:** `3307`
 
-- `SPRING_CONTAINER_PORT=8082`
+- `SPRING_CONTAINER_PORT`
 
   **Description:** Port where the User Service container will run
 
