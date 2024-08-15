@@ -10,27 +10,35 @@ A microservice that handles user basic information such as follows:
 
 To run this project, you will need to add the following environment variables to your .env file
 
+- `ACTIVE_PROFILE`
+
+  **Description:** profile being used by User Service.
+
+  **Usage:** set the value to "dev" for development and "prod" for production ready version
+
+  **Example:** `prod`
+
 #### Application environment variables for production (User Service Container)
 
-- `SPRING_DATASOURCE_URL`
+- `PROD_SPRING_DATASOURCE_URL`
 
   **Description:** URL of the datasource container for production
 
   **Example:** `jdbc:mariadb://db:3306/user_service`
 
-- `SPRING_DATASOURCE_USERNAME`
+- `PROD_SPRING_DATASOURCE_USERNAME`
 
   **Description:** Username to be used to get access on the database. _(the default mariadb root username is `root`)_
 
   **Example:** `root`
 
-- `SPRING_DATASOURCE_PASSWORD`
+- `PROD_SPRING_DATASOURCE_PASSWORD`
 
   **Description:** Password to be used to get access on the database
 
   **Example:** `Password123`
 
-- `SPRING_PORT`
+- `PROD_SPRING_PORT`
 
   **Description:** Port that the User Service will run inside the container
 
@@ -38,25 +46,25 @@ To run this project, you will need to add the following environment variables to
 
 #### Application environment variables for development
 
-- `SPRING_DATASOURCE_URL_DEV`
+- `DEV_SPRING_DATASOURCE_URL`
 
   **Description:** URL of the datasource container for development purposes
 
   **Example:** `jdbc:mariadb://localhost:3306/user_service`
 
-- `SPRING_DATASOURCE_USERNAME_DEV`
+- `DEV_SPRING_DATASOURCE_USERNAME`
 
   **Description:** Username of the database on development environment
 
   **Example:** `root_dev`
 
-- `SPRING_DATASOURCE_PASSWORD_DEV`
+- `DEV_SPRING_DATASOURCE_PASSWORD`
 
   **Description:** Password of the database on development environment
 
   **Example:** `password_for_dev`
 
-- `SPRING_PORT_DEV`
+- `DEV_SPRING_PORT`
 
   **Description:** Port of User Service in your development environment
 
