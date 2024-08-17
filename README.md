@@ -112,10 +112,10 @@ Go to the project directory
   cd my-project
 ```
 
-Set `src/main/resources/application.properties` to this:
+Set `ACTIVE_PROFILE` to this:
 
 ```
-spring.profiles.active=dev
+ACTIVE_PROFILE=dev
 
 ```
 
@@ -134,10 +134,10 @@ Run the Spring application
 
 Follow this steps to deploy the project on your server
 
-1. Set application.properties into this:
+1. Set `ACTIVE_PROFILE` into this:
 
 ```
-spring.profiles.active=prod
+ACTIVE_PROFILE=prod
 
 ```
 
