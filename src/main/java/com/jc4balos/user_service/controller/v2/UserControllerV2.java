@@ -1,8 +1,11 @@
 package com.jc4balos.user_service.controller.v2;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
-import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
-import com.jc4balos.user_service.service.users.v1.UserService;
+import com.jc4balos.user_service.exception.AsyncApplicationExceptionHandler;
+import com.jc4balos.user_service.service.users.v2.UserServiceV2;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +27,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("api/v2/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserControllerV2 {
 
     @Autowired
-    private UserService userService;
+    private UserServiceV2 userService;
 
     /**
      * @param newUserDto
@@ -36,16 +39,18 @@ public class UserController {
      */
 
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@Valid @RequestBody NewUserDto newUserDto, BindingResult bindingResult) {
+    @Async
+    CompletableFuture<ResponseEntity<?>> createUser(@Valid @RequestBody NewUserDto newUserDto,
+            BindingResult bindingResult) {
         try {
             if (!bindingResult.hasErrors()) {
-                return new ResponseEntity<>(userService.createUser(newUserDto),
-                        HttpStatus.OK);
+                return userService.createUser(newUserDto).thenApply(response -> new ResponseEntity<>(response,
+                        HttpStatus.OK));
             } else {
-                return ApplicationExceptionHandler.handleBadRequest(bindingResult);
+                return AsyncApplicationExceptionHandler.handleBadRequest(bindingResult);
             }
         } catch (Exception e) {
-            return ApplicationExceptionHandler.handleCustomException(e);
+            return AsyncApplicationExceptionHandler.handleCustomException(e);
         }
 
     }
@@ -61,16 +66,17 @@ public class UserController {
      */
 
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllUsers(@RequestParam int pageIndex, @RequestParam int itemsPerPage,
+    @Async
+    public CompletableFuture<ResponseEntity<?>> getAllUsers(@RequestParam int pageIndex, @RequestParam int itemsPerPage,
             @RequestParam String searchParam, @RequestParam String sortBy, @RequestParam String order) {
         try {
 
-            return new ResponseEntity<>(
-                    userService.getAllUsers(pageIndex, itemsPerPage, searchParam, sortBy, order),
-                    HttpStatus.OK);
+            return userService.getAllUsers(pageIndex, itemsPerPage, searchParam, sortBy, order)
+                    .thenApply(response -> new ResponseEntity<>(response,
+                            HttpStatus.OK));
 
         } catch (Exception e) {
-            return ApplicationExceptionHandler.handleCustomException(e);
+            return AsyncApplicationExceptionHandler.handleCustomException(e);
         }
 
     }
@@ -83,18 +89,20 @@ public class UserController {
      * @return response message
      */
     @PutMapping("/modify/{userId}")
-    public ResponseEntity<?> modifyUser(@Valid @RequestBody ModifyUserInfoDto modifyUserInfoDto,
+    @Async
+    public CompletableFuture<ResponseEntity<?>> modifyUser(@Valid @RequestBody ModifyUserInfoDto modifyUserInfoDto,
             BindingResult bindingResult,
             @PathVariable("userId") Long userId) {
         try {
             if (!bindingResult.hasErrors()) {
-                return new ResponseEntity<>(userService.modifyUserInfo(userId, modifyUserInfoDto),
-                        HttpStatus.OK);
+                return userService.modifyUserInfo(userId, modifyUserInfoDto)
+                        .thenApply(response -> new ResponseEntity<>(response,
+                                HttpStatus.OK));
             } else {
-                return ApplicationExceptionHandler.handleBadRequest(bindingResult);
+                return AsyncApplicationExceptionHandler.handleBadRequest(bindingResult);
             }
         } catch (Exception e) {
-            return ApplicationExceptionHandler.handleCustomException(e);
+            return AsyncApplicationExceptionHandler.handleCustomException(e);
         }
     }
 

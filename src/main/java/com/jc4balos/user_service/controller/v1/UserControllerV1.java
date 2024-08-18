@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
-import com.jc4balos.user_service.service.users.v1.UserService;
+import com.jc4balos.user_service.service.users.v1.UserServiceV1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("api/v1/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserControllerV1 {
 
     @Autowired
-    private UserService userService;
+    private UserServiceV1 userService;
 
     /**
      * @param newUserDto

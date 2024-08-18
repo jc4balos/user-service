@@ -33,6 +33,7 @@ public class AsyncApplicationExceptionHandler {
     public static CompletableFuture<ResponseEntity<?>> handleBadRequest(BindingResult bindingResult) {
         Map<String, String> errors = new HashMap<>();
         bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+
         return CompletableFuture
                 .completedFuture(new ResponseEntity<>(Map.of("message", errors), HttpStatus.BAD_REQUEST));
     }
