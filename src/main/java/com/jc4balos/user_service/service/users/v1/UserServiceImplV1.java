@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
@@ -56,8 +60,6 @@ public class UserServiceImplV1 implements UserServiceV1 {
         List<ViewUserDto> viewUserDtos = new ArrayList<>();
         Sort sort;
 
-        System.out.println("SORTING ORDER: " + order);
-
         if (order.equals("ASCENDING")) {
             sort = Sort.by(sortBy).ascending();
         } else if (order.equals("DESCENDING")) {
@@ -92,6 +94,19 @@ public class UserServiceImplV1 implements UserServiceV1 {
         User modifiedUser = userMapper.modifyUserInfoDto(modifyUserInfoDto, userToBeModified.get());
         userRepository.save(modifiedUser);
         return Map.of("message", modifiedUser.getUsername() + " successfully modified.");
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<ResponseEntity<?>> changeEmail(Long userId, String email) {
+        Optional<User> user = Optional.of(userRepository.findById(userId))
+                .orElseThrow(() -> new RuntimeException("User doesn't exist."));
+
+        user.get().setEmail(email);
+        Map<String, String> data = Map.of("message", user.get().getUsername() + " email was successfully modified.");
+        ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
+        return CompletableFuture.completedFuture(response);
     }
 
 }

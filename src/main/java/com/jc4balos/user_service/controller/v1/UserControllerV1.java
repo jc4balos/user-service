@@ -3,6 +3,7 @@ package com.jc4balos.user_service.controller.v1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,6 +21,7 @@ import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
 import com.jc4balos.user_service.service.users.v1.UserServiceV1;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -100,9 +102,17 @@ public class UserControllerV1 {
     }
 
     @PatchMapping("/change-email/{userId}")
-    public CompletableFuture<ResponseEntity<?>> changeEmail(@Valid @Email(message = "Email is not valid.") @RequestParam newEmail, @PathVariable{userId} Long userId){
+    @Async
+    public CompletableFuture<ResponseEntity<?>> changeEmail(
+            @Valid @Email(message = "Email is not valid.") @RequestParam String newEmail,
+            @PathVariable("userId") Long userId, BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+            return userService.changePassword(userId, newEmail).exceptionally(
+                    e -> ApplicationExceptionHandler.handleCustomException(e));
 
-        
+        } else {
+            return CompletableFuture.completedFuture(ApplicationExceptionHandler.handleBadRequest(bindingResult));
+        }
     }
 
     // TODO: @PatchMapping("/change-password/{userId}")

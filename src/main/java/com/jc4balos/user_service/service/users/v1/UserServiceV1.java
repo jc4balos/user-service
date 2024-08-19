@@ -1,7 +1,9 @@
 package com.jc4balos.user_service.service.users.v1;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
@@ -35,4 +37,6 @@ public interface UserServiceV1 {
      */
     @Deprecated
     Map<String, String> modifyUserInfo(Long userId, ModifyUserInfoDto modifyUserInfoDto);
+
+    CompletableFuture<ResponseEntity<?>> changeEmail(Long userId, String email);
 }
