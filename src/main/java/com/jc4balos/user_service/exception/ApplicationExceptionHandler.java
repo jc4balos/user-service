@@ -40,4 +40,12 @@ public class ApplicationExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    public static ResponseEntity<?> handleCustomException(Throwable e) {
+        Map<String, Object> response = new HashMap<>();
+        Throwable cause = e.getCause();
+        String message = cause.getMessage();
+        response.put("message", message);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 }

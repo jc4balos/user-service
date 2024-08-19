@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -98,7 +99,11 @@ public class UserControllerV1 {
         }
     }
 
-    // TODO: @PatchMapping("/change-email/{userId}")
+    @PatchMapping("/change-email/{userId}")
+    public CompletableFuture<ResponseEntity<?>> changeEmail(@Valid @Email(message = "Email is not valid.") @RequestParam newEmail, @PathVariable{userId} Long userId){
+
+        
+    }
 
     // TODO: @PatchMapping("/change-password/{userId}")
 

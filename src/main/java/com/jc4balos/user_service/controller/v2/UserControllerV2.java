@@ -3,7 +3,6 @@ package com.jc4balos.user_service.controller.v2;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.BindingResult;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
-import com.jc4balos.user_service.exception.AsyncApplicationExceptionHandler;
+import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
 import com.jc4balos.user_service.service.users.v2.UserServiceV2;
 
 import jakarta.validation.Valid;
@@ -42,17 +41,13 @@ public class UserControllerV2 {
     @Async
     CompletableFuture<ResponseEntity<?>> createUser(@Valid @RequestBody NewUserDto newUserDto,
             BindingResult bindingResult) {
-        try {
-            if (!bindingResult.hasErrors()) {
-                return userService.createUser(newUserDto).thenApply(response -> new ResponseEntity<>(response,
-                        HttpStatus.OK));
-            } else {
-                return AsyncApplicationExceptionHandler.handleBadRequest(bindingResult);
-            }
-        } catch (Exception e) {
-            return AsyncApplicationExceptionHandler.handleCustomException(e);
-        }
 
+        if (!bindingResult.hasErrors()) {
+            return userService.createUser(newUserDto)
+                    .exceptionally(e -> ApplicationExceptionHandler.handleCustomException(e));
+        } else {
+            return CompletableFuture.completedFuture(ApplicationExceptionHandler.handleBadRequest(bindingResult));
+        }
     }
 
     /**
@@ -69,15 +64,10 @@ public class UserControllerV2 {
     @Async
     public CompletableFuture<ResponseEntity<?>> getAllUsers(@RequestParam int pageIndex, @RequestParam int itemsPerPage,
             @RequestParam String searchParam, @RequestParam String sortBy, @RequestParam String order) {
-        try {
 
-            return userService.getAllUsers(pageIndex, itemsPerPage, searchParam, sortBy, order)
-                    .thenApply(response -> new ResponseEntity<>(response,
-                            HttpStatus.OK));
-
-        } catch (Exception e) {
-            return AsyncApplicationExceptionHandler.handleCustomException(e);
-        }
+        return userService.getAllUsers(pageIndex, itemsPerPage, searchParam, sortBy, order)
+                .exceptionally(
+                        e -> ApplicationExceptionHandler.handleCustomException(e));
 
     }
 
@@ -93,22 +83,18 @@ public class UserControllerV2 {
     public CompletableFuture<ResponseEntity<?>> modifyUser(@Valid @RequestBody ModifyUserInfoDto modifyUserInfoDto,
             BindingResult bindingResult,
             @PathVariable("userId") Long userId) {
-        try {
-            if (!bindingResult.hasErrors()) {
-                return userService.modifyUserInfo(userId, modifyUserInfoDto)
-                        .thenApply(response -> new ResponseEntity<>(response,
-                                HttpStatus.OK));
-            } else {
-                return AsyncApplicationExceptionHandler.handleBadRequest(bindingResult);
-            }
-        } catch (Exception e) {
-            return AsyncApplicationExceptionHandler.handleCustomException(e);
+
+        if (!bindingResult.hasErrors()) {
+            return userService.modifyUserInfo(userId, modifyUserInfoDto).exceptionally(
+                    e -> ApplicationExceptionHandler.handleCustomException(e));
+
+        } else {
+            return CompletableFuture.completedFuture(ApplicationExceptionHandler.handleBadRequest(bindingResult));
         }
+
     }
 
     // TODO: @PatchMapping("/change-email/{userId}")
-
-    // TODO: @PatchMapping("/change-password/{userId}")
 
     // TODO: @PatchMapping("/change-contact-number/{userId}")
 

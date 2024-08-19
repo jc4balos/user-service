@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImplV2 implements UserServiceV2 {
 
+    // TODO: Return response entity on service layer and handle the exceptions
+    // accordingly
+
     private final UserRepository userRepository;
 
     @Autowired
@@ -40,20 +45,33 @@ public class UserServiceImplV2 implements UserServiceV2 {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<Map<String, String>> createUser(NewUserDto newUserDto) {
+    public CompletableFuture<ResponseEntity<?>> createUser(NewUserDto newUserDto) {
+
         User newUser = userMapper.newUserDto(newUserDto);
 
         // TODO: make a guard clause for duplicate usernames and return username already
-        // e
+        // exists
+        Optional.ofNullable(userRepository.findByUsername(newUserDto.getUsername()))
+                .ifPresent(user -> {
+                    throw new RuntimeException("Username already used.");
+                });
+
+        Optional.ofNullable(userRepository.findByEmail(newUserDto.getEmail()))
+                .ifPresent(user -> {
+                    throw new RuntimeException("Email already used.");
+                });
 
         userRepository.save(newUser);
         String message = "User " + newUser.getUsername() + " created successfully.";
         logger.info(message);
-        return CompletableFuture.completedFuture(Map.of("message", message));
+        ResponseEntity<?> response = new ResponseEntity<>(Map.of("message", message), HttpStatus.CREATED);
+        return CompletableFuture.completedFuture(response);
+
     }
 
     @Override
-    public CompletableFuture<Map<String, Object>> getAllUsers(int pageIndex, int itemsPerPage, String searchParam,
+    @Async
+    public CompletableFuture<ResponseEntity<?>> getAllUsers(int pageIndex, int itemsPerPage, String searchParam,
             String sortBy,
             String order) {
 
@@ -80,23 +98,29 @@ public class UserServiceImplV2 implements UserServiceV2 {
             viewUserDtos.add(mappedUser);
         }
 
-        Map<String, Object> response = Map.of("pageIndex", users.getNumber(),
+        Map<String, Object> data = Map.of("pageIndex", users.getNumber(),
                 "totalPages", users.getTotalPages(),
                 "users", viewUserDtos);
+
+        ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
 
         return CompletableFuture.completedFuture(response);
     }
 
     @Override
     @Transactional
-    public CompletableFuture<Map<String, String>> modifyUserInfo(Long userId, ModifyUserInfoDto modifyUserInfoDto) {
+    @Async
+    public CompletableFuture<ResponseEntity<?>> modifyUserInfo(Long userId, ModifyUserInfoDto modifyUserInfoDto) {
         Optional<User> userToBeModified = Optional.of(userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User doesn't exist")));
 
         User modifiedUser = userMapper.modifyUserInfoDto(modifyUserInfoDto, userToBeModified.get());
         userRepository.save(modifiedUser);
+        Map<String, String> data = Map.of("message", modifiedUser.getUsername() + " successfully modified.");
+
+        ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
         return CompletableFuture
-                .completedFuture(Map.of("message", modifiedUser.getUsername() + " successfully modified."));
+                .completedFuture(response);
     }
 
 }
