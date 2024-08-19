@@ -5,8 +5,9 @@ import java.security.NoSuchAlgorithmException;
 
 public class StringHasher {
 
-    public static String hashString(String string, String salt) {
+    public static String createPassword(String string) {
         try {
+            String salt = SaltGenerator.generateSalt(16);
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             String concatedString = string + salt;
             byte[] hashedBytes = messageDigest.digest(concatedString.getBytes());
