@@ -1,12 +1,15 @@
 package com.jc4balos.user_service.mapper.user_mapper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.dto.user.ViewUserDto;
 import com.jc4balos.user_service.model.User;
-import com.jc4balos.user_service.utils.StringHasher;
+import com.jc4balos.user_service.utils.PasswordHasher;
 
 @Component
 public class UserMapper {
@@ -27,8 +30,12 @@ public class UserMapper {
         user.setAddressLine2(newUserDto.getAddressLine2());
         user.setAddressLine3(newUserDto.getAddressLine3());
         user.setEmail(newUserDto.getEmail());
-        user.setPassword(StringHasher.hashString(newUserDto.getPassword(), newUserDto.getEmail()));
+
+        Map<String, String> passwordDetails = new HashMap<>(PasswordHasher.createPassword(newUserDto.getPassword()));
+        user.setPassword(passwordDetails.get("password"));
+        user.setSalt(passwordDetails.get("salt"));
         user.setIsActive(true);
+
         return user;
     }
 

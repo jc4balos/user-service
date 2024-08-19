@@ -18,12 +18,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.jc4balos.user_service.dto.user.ChangeEmailDto;
+import com.jc4balos.user_service.dto.user.ChangePasswordDto;
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.dto.user.ViewUserDto;
 import com.jc4balos.user_service.mapper.user_mapper.UserMapper;
 import com.jc4balos.user_service.model.User;
 import com.jc4balos.user_service.repository.UserRepository;
+import com.jc4balos.user_service.utils.PasswordHasher;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -99,12 +102,46 @@ public class UserServiceImplV1 implements UserServiceV1 {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<ResponseEntity<?>> changeEmail(Long userId, String email) {
+    public CompletableFuture<ResponseEntity<?>> changeEmail(Long userId, ChangeEmailDto changeEmailDto) {
         Optional<User> user = Optional.of(userRepository.findById(userId))
                 .orElseThrow(() -> new RuntimeException("User doesn't exist."));
 
-        user.get().setEmail(email);
-        Map<String, String> data = Map.of("message", user.get().getUsername() + " email was successfully modified.");
+        User thisUser = user.get();
+
+        thisUser.setEmail(changeEmailDto.getNewEmail());
+        userRepository.save(thisUser);
+
+        Map<String, String> data = Map.of("message",
+                thisUser.getUsername() + " email was successfully modified.");
+        ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
+        return CompletableFuture.completedFuture(response);
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<ResponseEntity<?>> changePassword(Long userId, ChangePasswordDto changePasswordDto) {
+        Optional<User> user = Optional.of(userRepository.findById(userId))
+                .orElseThrow(() -> new RuntimeException("User doesn't exist."));
+
+        User thisUser = user.get();
+
+        // check if old password matches the password in db
+        String hashedOldPassword = PasswordHasher.hashPassword(thisUser, changePasswordDto.getOldPassword());
+        if (!thisUser.getPassword().equals(hashedOldPassword)) {
+            throw new RuntimeException("Incorrect old Password. Please try again.");
+        }
+
+        // check if newpassword matches confirm new password
+        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmNewPassword())) {
+            throw new RuntimeException("New password and confirm password doesn't match. Please try again.");
+        }
+
+        String hashedNewPassword = PasswordHasher.hashPassword(thisUser, changePasswordDto.getNewPassword());
+
+        thisUser.setPassword(hashedNewPassword);
+        userRepository.save(thisUser);
+        Map<String, String> data = Map.of("message", user.get().getUsername() + " password was successfully modified.");
         ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
         return CompletableFuture.completedFuture(response);
     }
