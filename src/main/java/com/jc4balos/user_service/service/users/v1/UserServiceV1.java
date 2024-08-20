@@ -14,10 +14,13 @@ import com.jc4balos.user_service.dto.user.NewUserDto;
 @Service
 public interface UserServiceV1 {
 
+    @Deprecated
     Map<String, String> createUser(NewUserDto newUserDto);
 
+    @Deprecated
     Map<String, Object> getAllUsers(int pageIndex, int itemsPerPage, String searchParam, String sortBy, String order);
 
+    @Deprecated
     Map<String, String> modifyUserInfo(Long userId, ModifyUserInfoDto modifyUserInfoDto);
 
     CompletableFuture<ResponseEntity<?>> changeEmail(Long userId, ChangeEmailDto changeEmailDto);
