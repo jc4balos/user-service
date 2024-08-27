@@ -1,4 +1,4 @@
-package com.jc4balos.user_service.service.users.v2;
+package com.jc4balos.user_service.service.users.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,31 +16,35 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.jc4balos.user_service.dto.user.ChangeEmailDto;
+import com.jc4balos.user_service.dto.user.ChangePasswordDto;
 import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.user.NewUserDto;
 import com.jc4balos.user_service.dto.user.ViewUserDto;
 import com.jc4balos.user_service.mapper.user_mapper.UserMapper;
 import com.jc4balos.user_service.model.User;
 import com.jc4balos.user_service.repository.UserRepository;
+import com.jc4balos.user_service.service.users.UserService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImplV2 implements UserServiceV2 {
-
-    // TODO: Return response entity on service layer and handle the exceptions
-    // accordingly
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
     private UserMapper userMapper;
 
-    private final Logger logger = LoggerFactory.getLogger(UserServiceImplV2.class);
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     @Transactional
@@ -121,6 +125,54 @@ public class UserServiceImplV2 implements UserServiceV2 {
         ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
         return CompletableFuture
                 .completedFuture(response);
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<ResponseEntity<?>> changeEmail(Long userId, ChangeEmailDto changeEmailDto) {
+        Optional<User> user = Optional.of(userRepository.findById(userId))
+                .orElseThrow(() -> new RuntimeException("User doesn't exist."));
+
+        User thisUser = user.get();
+
+        thisUser.setEmail(changeEmailDto.getNewEmail());
+        userRepository.save(thisUser);
+
+        Map<String, String> data = Map.of("message",
+                thisUser.getUsername() + " email was successfully modified.");
+        ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
+        return CompletableFuture.completedFuture(response);
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<ResponseEntity<?>> changePassword(Long userId, ChangePasswordDto changePasswordDto) {
+        Optional<User> user = Optional.of(userRepository.findById(userId))
+                .orElseThrow(() -> new RuntimeException("User doesn't exist."));
+
+        User thisUser = user.get();
+
+        // check if old password matches the password in db
+        Boolean isPasswordCorrect = bCryptPasswordEncoder.matches(changePasswordDto.getOldPassword(),
+                thisUser.getPassword());
+        if (!isPasswordCorrect) {
+            throw new RuntimeException("Incorrect old Password. Please try again.");
+        }
+
+        // check if newpassword matches confirm new password
+        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmNewPassword())) {
+            throw new RuntimeException("New password and confirm password doesn't match. Please try again.");
+        }
+
+        String hashedNewPassword = bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword());
+
+        thisUser.setPassword(hashedNewPassword);
+        userRepository.save(thisUser);
+        Map<String, String> data = Map.of("message", user.get().getUsername() + " password was successfully modified.");
+        ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
+        return CompletableFuture.completedFuture(response);
     }
 
 }

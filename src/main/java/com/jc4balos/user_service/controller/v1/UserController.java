@@ -1,4 +1,4 @@
-package com.jc4balos.user_service.controller.v2;
+package com.jc4balos.user_service.controller.v1;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,21 +16,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
-import com.jc4balos.user_service.dto.user.NewUserDto;
+import com.jc4balos.user_service.dto.request.user.ChangeEmailDto;
+import com.jc4balos.user_service.dto.request.user.ChangePasswordDto;
+import com.jc4balos.user_service.dto.request.user.ModifyUserInfoDto;
+import com.jc4balos.user_service.dto.request.user.NewUserDto;
 import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
-import com.jc4balos.user_service.service.users.v2.UserServiceV2;
+import com.jc4balos.user_service.service.users.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/v2/users")
+@RequestMapping("api/v1/users")
 @RequiredArgsConstructor
-public class UserControllerV2 {
+public class UserController {
 
     @Autowired
-    private UserServiceV2 userService;
+    private UserService userService;
 
     /**
      * @param newUserDto
@@ -37,7 +40,7 @@ public class UserControllerV2 {
      * @return response message
      */
 
-    @PostMapping("/create")
+    @PostMapping("/register")
     @Async
     CompletableFuture<ResponseEntity<?>> createUser(@Valid @RequestBody NewUserDto newUserDto,
             BindingResult bindingResult) {
@@ -94,7 +97,35 @@ public class UserControllerV2 {
 
     }
 
-    // TODO: @PatchMapping("/change-email/{userId}")
+    @PatchMapping("/change-email/{userId}")
+    @Async
+    public CompletableFuture<ResponseEntity<?>> changeEmail(@PathVariable("userId") Long userId,
+            @Valid @RequestBody ChangeEmailDto newEmail,
+            BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+            return userService.changeEmail(userId, newEmail).exceptionally(
+                    e -> ApplicationExceptionHandler.handleCustomException(e));
+
+        } else {
+            return CompletableFuture.completedFuture(ApplicationExceptionHandler.handleBadRequest(bindingResult));
+        }
+
+    }
+
+    @PatchMapping("/change-password/{userId}")
+    @Async
+    public CompletableFuture<ResponseEntity<?>> changePassword(@PathVariable("userId") Long userId,
+            @Valid @RequestBody ChangePasswordDto passwordDto,
+            BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+            return userService.changePassword(userId, passwordDto).exceptionally(
+                    e -> ApplicationExceptionHandler.handleCustomException(e));
+
+        } else {
+            return CompletableFuture.completedFuture(ApplicationExceptionHandler.handleBadRequest(bindingResult));
+        }
+
+    }
 
     // TODO: @PatchMapping("/change-contact-number/{userId}")
 
