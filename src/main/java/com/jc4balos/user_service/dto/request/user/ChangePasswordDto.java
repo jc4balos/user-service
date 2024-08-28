@@ -1,4 +1,4 @@
-package com.jc4balos.user_service.dto.user;
+package com.jc4balos.user_service.dto.request.user;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;

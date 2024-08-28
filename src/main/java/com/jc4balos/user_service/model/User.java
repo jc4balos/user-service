@@ -89,6 +89,4 @@ public class User {
     @Column(nullable = false, name = "is_active")
     private Boolean isActive;
 
-    @Column(nullable = false, name = "salt")
-    private String salt;
 }

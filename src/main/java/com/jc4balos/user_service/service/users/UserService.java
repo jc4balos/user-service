@@ -5,10 +5,12 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.jc4balos.user_service.dto.user.ChangeEmailDto;
-import com.jc4balos.user_service.dto.user.ChangePasswordDto;
-import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
-import com.jc4balos.user_service.dto.user.NewUserDto;
+import com.jc4balos.user_service.dto.request.user.ChangeEmailDto;
+import com.jc4balos.user_service.dto.request.user.ChangePasswordDto;
+import com.jc4balos.user_service.dto.request.user.ModifyUserInfoDto;
+import com.jc4balos.user_service.dto.request.user.NewUserDto;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public interface UserService {
@@ -23,5 +25,7 @@ public interface UserService {
             String sortBy, String order);
 
     CompletableFuture<ResponseEntity<?>> modifyUserInfo(Long userId, ModifyUserInfoDto modifyUserInfoDto);
+
+    CompletableFuture<ResponseEntity<?>> login(String authentication, HttpServletResponse response);
 
 }

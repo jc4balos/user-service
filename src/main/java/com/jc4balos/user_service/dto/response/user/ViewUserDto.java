@@ -1,4 +1,4 @@
-package com.jc4balos.user_service.dto.user;
+package com.jc4balos.user_service.dto.response.user;
 
 import java.time.LocalDate;
 

@@ -4,16 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.jc4balos.user_service.dto.user.ModifyUserInfoDto;
-import com.jc4balos.user_service.dto.user.NewUserDto;
-import com.jc4balos.user_service.dto.user.ViewUserDto;
+import com.jc4balos.user_service.dto.request.user.ModifyUserInfoDto;
+import com.jc4balos.user_service.dto.request.user.NewUserDto;
+import com.jc4balos.user_service.dto.response.user.ViewUserDto;
 import com.jc4balos.user_service.model.User;
 
 @Component
 public class UserMapper {
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
+    private BCryptPasswordEncoder passwordEncoder;
 
     // TODO: use builder for better readability
 
@@ -31,10 +31,8 @@ public class UserMapper {
         user.setAddressLine2(newUserDto.getAddressLine2());
         user.setAddressLine3(newUserDto.getAddressLine3());
         user.setEmail(newUserDto.getEmail());
-
-        user.setPassword(bCryptPasswordEncoder.encode(newUserDto.getPassword()));
+        user.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
         user.setIsActive(true);
-
         return user;
     }
 

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,7 @@ import com.jc4balos.user_service.dto.request.user.NewUserDto;
 import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
 import com.jc4balos.user_service.service.users.UserService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -124,6 +126,17 @@ public class UserController {
         } else {
             return CompletableFuture.completedFuture(ApplicationExceptionHandler.handleBadRequest(bindingResult));
         }
+
+    }
+
+    @PostMapping("/login")
+    @Async
+    public CompletableFuture<ResponseEntity<?>> login(@RequestHeader("Authorization") String authentication,
+            HttpServletResponse response) {
+
+        return userService.login(authentication, response)
+                .exceptionally(
+                        e -> ApplicationExceptionHandler.handleCustomException(e));
 
     }
 
