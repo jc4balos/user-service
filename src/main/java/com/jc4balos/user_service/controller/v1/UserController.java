@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +23,6 @@ import com.jc4balos.user_service.dto.request.user.NewUserDto;
 import com.jc4balos.user_service.exception.ApplicationExceptionHandler;
 import com.jc4balos.user_service.service.users.UserService;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +30,11 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
+
+    // TODO: Implement the security on gateway since the security here is now
+    // working. Configure the environment variable for the gateway to use the
+    // user_db in authenticating users. This will avoid on clashing on async
+    // requests
 
     @Autowired
     private UserService userService;
@@ -66,7 +69,7 @@ public class UserController {
      */
 
     @GetMapping("/get-all")
-    @Async
+    // @Async
     public CompletableFuture<ResponseEntity<?>> getAllUsers(@RequestParam int pageIndex, @RequestParam int itemsPerPage,
             @RequestParam String searchParam, @RequestParam String sortBy, @RequestParam String order) {
 
@@ -129,15 +132,19 @@ public class UserController {
 
     }
 
-    @PostMapping("/login")
+    @GetMapping("/user/{username}")
     @Async
-    public CompletableFuture<ResponseEntity<?>> login(@RequestHeader("Authorization") String authentication,
-            HttpServletResponse response) {
+    public CompletableFuture<ResponseEntity<?>> getUser(@PathVariable("username") String username) {
 
-        return userService.login(authentication, response)
+        return userService.getUser(username)
                 .exceptionally(
                         e -> ApplicationExceptionHandler.handleCustomException(e));
+    }
 
+    @GetMapping("/test")
+    @Async
+    public String test() {
+        return "You Bypassed JWTFilter!!";
     }
 
     // TODO: @PatchMapping("/change-contact-number/{userId}")

@@ -10,8 +10,6 @@ import com.jc4balos.user_service.dto.request.user.ChangePasswordDto;
 import com.jc4balos.user_service.dto.request.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.request.user.NewUserDto;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 @Service
 public interface UserService {
 
@@ -26,6 +24,6 @@ public interface UserService {
 
     CompletableFuture<ResponseEntity<?>> modifyUserInfo(Long userId, ModifyUserInfoDto modifyUserInfoDto);
 
-    CompletableFuture<ResponseEntity<?>> login(String authentication, HttpServletResponse response);
+    CompletableFuture<ResponseEntity<?>> getUser(String username);
 
 }

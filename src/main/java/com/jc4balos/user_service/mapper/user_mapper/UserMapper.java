@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.jc4balos.user_service.dto.request.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.request.user.NewUserDto;
+import com.jc4balos.user_service.dto.response.user.UserCredentialsDto;
 import com.jc4balos.user_service.dto.response.user.ViewUserDto;
 import com.jc4balos.user_service.model.User;
 
@@ -65,6 +66,13 @@ public class UserMapper {
         currentUser.setHusbandSurname(modifyUserDto.getHusbandSurname());
         currentUser.setSex(modifyUserDto.getSex());
         return currentUser;
+    }
+
+    public UserCredentialsDto userCredentialsDto(User user) {
+        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder().email(user.getEmail())
+                .isActive(user.getIsActive()).password(user.getPassword()).userId(user.getUserId())
+                .username(user.getUsername()).build();
+        return userCredentialsDto;
     }
 
 }
