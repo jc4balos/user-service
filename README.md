@@ -99,6 +99,7 @@ To run this project, you will need to add the following environment variables to
   **Example:** `SPRING_CONTAINER_PORT=8080`
 
 #### Threading and DB Connection Configuration
+
 - `THREAD_CORE_POOL_SIZE`
 
   **Description:** Number of threads to keep in a pool when idling.
@@ -150,7 +151,6 @@ To run this project, you will need to add the following environment variables to
   **Description:** Determines the maximum amount of time (in milliseconds) that HikariCP will wait for a connection from the pool before timing out.
 
   **Example:** `DB_CONNECTION_TIMEOUT_MS=30000`
-
 
 ## Run Locally (Development)
 
@@ -239,3 +239,7 @@ sudo docker compose -f docker-compose-service-only.yaml up --build
 Go to https://voltesiv.postman.co/workspace/954c2fe7-c7cc-4b73-9ea5-8fda4e20efd7 to see test API Endpoints.
 
 Stay tuned for futher updates!
+
+docker build -t user-service .
+
+docker run --name user-service-container --env-file .env -p 8082:8082 user-service

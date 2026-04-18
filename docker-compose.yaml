@@ -1,38 +1,32 @@
-services:
-  db:
-    container_name: mariadb_container
-    image: mariadb:latest
-    environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-    ports:
-      - "${DATABASE_CONTAINER_PORT}:${MARIADB_PORT}"
-    volumes:
-      - /home/db-data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: always
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-p ${MARIADB_ROOT_PASSWORD}",
-        ]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 5s
+version: "3.8"
 
-  backend:
-    build: .
+services:
+  user-service:
+    image: amazoncorretto:17
     container_name: user-service
+    working_dir: /app
+
     ports:
-      - "${SPRING_CONTAINER_PORT}:${SPRING_CONTAINER_PORT}"
-    environment:
-      db-url: ${SPRING_DATASOURCE_URL}
-      db-username: ${SPRING_DATASOURCE_USERNAME}
-      db-password: ${SPRING_DATASOURCE_PASSWORD}
-      depends_on: db
-      restart: always
+      - "${DEV_SPRING_PORT:-8082}:8082"
+
+    env_file: 
+      - .env
+
+    volumes:
+      - ./target/user_service.jar:/app/user_service.jar
+
+    command: >
+      sh -c "
+      if [ \"$ACTIVE_PROFILE\" = 'PROD' ]; then
+        export SPRING_DATASOURCE_URL=$PROD_SPRING_DATASOURCE_URL &&
+        export SPRING_DATASOURCE_USERNAME=$PROD_SPRING_DATASOURCE_USERNAME &&
+        export SPRING_DATASOURCE_PASSWORD=$PROD_SPRING_DATASOURCE_PASSWORD &&
+        export SERVER_PORT=$PROD_SPRING_PORT;
+      else
+        export SPRING_DATASOURCE_URL=$DEV_SPRING_DATASOURCE_URL &&
+        export SPRING_DATASOURCE_USERNAME=$DEV_SPRING_DATASOURCE_USERNAME &&
+        export SPRING_DATASOURCE_PASSWORD=$DEV_SPRING_DATASOURCE_PASSWORD &&
+        export SERVER_PORT=$DEV_SPRING_PORT;
+      fi &&
+      java -jar user_service.jar
+      "

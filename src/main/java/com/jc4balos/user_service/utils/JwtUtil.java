@@ -3,7 +3,6 @@ package com.jc4balos.user_service.utils;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,16 +11,15 @@ import com.jc4balos.user_service.model.Role;
 import com.jc4balos.user_service.model.User;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
-    @Value("${JWT.SECRET}")
+    @Value("${JWT_SECRET}")
     private String secret;
 
-    @Value("${JWT.EXPIRATION}")
+    @Value("${JWT_EXPIRATION}")
     private Long expiration; // in milliseconds
 
     public String generateToken(User user, List<Role> rolesList) {
@@ -30,11 +28,10 @@ public class JwtUtil {
                     .subject(user.getUsername()) // was .setSubject()
                     .claim("user_uuid", user.getUserUUID())
                     .claim("roles", rolesList.stream()
-                            .map(role -> Map.of(
-                                    "role_uuid", role.getRoleUUID().toString(),
-                                    "role_name", role.getRoleName()))
-                            .toList())
+                            .map(Role::getRoleName)
+                            .toList()) // Convert Role objects to a list of role names
                     .issuedAt(new Date()) // was .setIssuedAt()
+                    .notBefore(new Date()) // 👈 ADD THIS
                     .expiration(new Date(System.currentTimeMillis() + expiration)) // was .setExpiration()
                     .signWith(getSigningKey()) // no need to pass algorithm separately
                     .compact();
@@ -47,7 +44,6 @@ public class JwtUtil {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret); // secret should be Base64-encoded
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 }
