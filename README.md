@@ -1,241 +1,237 @@
-# User Service
+# 🧑‍💻 User Service (Spring Boot REST API Microservice)
 
-A microservice that handles user basic information such as follows:
-
-- Basic User Data
-- Log In Credentials
-- Change Password
-
-## Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file
-
-- `ACTIVE_PROFILE`
-
-  **Description:** profile being used by User Service.
-
-  **Usage:** set the value to "dev" for development and "prod" for production ready version
-
-  **Example:** `ACTIVE_PROFILE=prod`
-
-#### Application environment variables for production (User Service Container)
-
-- `PROD_SPRING_DATASOURCE_URL`
-
-  **Description:** URL of the datasource container for production
-
-  **Example:** `PROD_SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/user_service`
-
-- `PROD_SPRING_DATASOURCE_USERNAME`
-
-  **Description:** Username to be used to get access on the database. _(the default mariadb root username is `root`)_
-
-  **Example:** `PROD_SPRING_DATASOURCE_USERNAME=root`
-
-- `PROD_SPRING_DATASOURCE_PASSWORD`
-
-  **Description:** Password to be used to get access on the database
-
-  **Example:** `PROD_SPRING_DATASOURCE_PASSWORD=Password123`
-
-- `PROD_SPRING_PORT`
-
-  **Description:** Port that the User Service will run inside the container
-
-  **Example:** `PROD_SPRING_PORT=8080`
-
-#### Application environment variables for development
-
-- `DEV_SPRING_DATASOURCE_URL`
-
-  **Description:** URL of the datasource container for development purposes
-
-  **Example:** `DEV_SPRING_DATASOURCE_URL=jdbc:mariadb://localhost:3306/user_service`
-
-- `DEV_SPRING_DATASOURCE_USERNAME`
-
-  **Description:** Username of the database on development environment
-
-  **Example:** `DEV_SPRING_DATASOURCE_USERNAME=root_dev`
-
-- `DEV_SPRING_DATASOURCE_PASSWORD`
-
-  **Description:** Password of the database on development environment
-
-  **Example:** `DEV_SPRING_DATASOURCE_PASSWORD=password_for_dev`
-
-- `DEV_SPRING_PORT`
-
-  **Description:** Port of User Service in your development environment
-
-  **Example:** `DEV_SPRING_PORT=8080`
-
-#### MariaDB Container environment variables
-
-- `MARIADB_ROOT_PASSWORD`
-
-  **Description:** Root password for mariadb container
-
-  **Example:** `MARIADB_ROOT_PASSWORD=root_dev`
-
-- `MARIADB_PORT`
-
-  **Description:** Port that mariadb will run inside the mariadb container
-
-  **Example:** `MARIADB_PORT=3306`
-
-#### Container environment variables
-
-- `DATABASE_CONTAINER_PORT`
-
-  **Description:** Port where the mariadb container will run
-
-  **Example:** `DATABASE_CONTAINER_PORT=3307`
-
-- `SPRING_CONTAINER_PORT`
-
-  **Description:** Port where the User Service container will run
-
-  **Example:** `SPRING_CONTAINER_PORT=8080`
-
-#### Threading and DB Connection Configuration
-- `THREAD_CORE_POOL_SIZE`
-
-  **Description:** Number of threads to keep in a pool when idling.
-
-  **Example:** `THREAD_CORE_POOL_SIZE=4`
-
-- `THREAD_MAX_POOL_SIZE`
-
-  **Description:** Maximum number of threads that a pool can handle.
-
-  **Example:** `THREAD_MAX_POOL_SIZE=50`
-
-- `THREAD_QUEUE_CAPACITY`
-
-  **Description:** Number of task to be queued to execute if there are no more threads available.These will depend on the.
-
-  **Example:** `THREAD_QUEUE_CAPACITY=600`
-
-- `THREAD_KEEP_ALIVE_MS`
-
-  **Description:** The amount of time in milliseconds when idle threads will be terminated.
-
-  **Example:** `THREAD_KEEP_ALIVE_MS=60000`
-
-- `DB_MAX_POOL_SIZE`
-
-  **Description:** Sets the maximum number of connections that the pool can accommodate.
-
-  **Example:** `DB_MAX_POOL_SIZE=30`
-
-- `DB_MIN_IDLE_CONNECTIONS`
-
-  **Description:** Defines the minimum number of idle connections that HikariCP attempts to maintain in the pool.
-
-  **Example:** `DB_MIN_IDLE_CONNECTIONS=10`
+A Spring Boot microservice that provides REST APIs for user management, authentication, and account handling.
 
 ---
 
-- `DB_CONNECTION_LIFETIME_MS`
+# ✨ Features
 
-  **Description:** Specifies the maximum lifetime of a connection in the pool, in milliseconds.
-
-  **Example:** `DB_CONNECTION_LIFETIME_MS=3600000`
+- User Management (basic profile data)
+- Authentication (Login / JWT-ready structure)
+- Password Management (Change Password)
+- RBAC-ready architecture
+- MySQL + JPA persistence
+- Environment-based configuration (dev / docker / prod)
+- Thread pool configuration support
+- HikariCP connection pooling
+- REST API-based microservice
 
 ---
 
-- `DB_CONNECTION_TIMEOUT_MS`
+# 📦 Prerequisites
 
-  **Description:** Determines the maximum amount of time (in milliseconds) that HikariCP will wait for a connection from the pool before timing out.
+## Development Requirements
 
-  **Example:** `DB_CONNECTION_TIMEOUT_MS=30000`
+- Java 17 (REQUIRED)
+- Maven 3.8+
+- Git
+- Visual Studio Code
+- Spring Boot Extension Pack (VS Code)
 
+## API Testing Tool
 
-## Run Locally (Development)
+- Bruno (recommended)
+  - REST API testing tool
+  - Collection-based requests
+  - Environment support
 
-Clone the project
+---
 
-```bash
-  git clone https://github.com/jc4balos/user-service.git
-```
+# 📁 Repository
 
-Go to the project directory
+git clone https://github.com/tlgc-it-dept/user-service.git
+cd user-service
 
-```bash
-  cd my-project
-```
+---
 
-Set `ACTIVE_PROFILE` to this:
+# ⚙️ Environment Variables
 
-```
+This service can load environment values from a root `.env` file when using the **dev** profile.
+
+Create a `.env` file in the service root directory:
+
+```properties
 ACTIVE_PROFILE=dev
-
+DB_USERNAME=root_dev
+DB_PASSWORD=password_for_dev
 ```
 
-Clean and compile via maven
+> `application-dev.properties` uses `spring.config.import=file:.env[.properties]`.
 
+---
+
+## Database (what the profiles expect)
+
+### 1) `dev` (local database)
+
+- `spring.datasource.url` is fixed to:
+  - `jdbc:mysql://localhost:3306/user_service`
+- Required:
+  - `DB_USERNAME`
+  - `DB_PASSWORD`
+
+### 2) `docker` (container network)
+
+Used by `application-docker.properties`.
+
+Required:
+
+- `DB_HOST` (e.g., a MySQL container name)
+- `DB_USERNAME`
+- `DB_PASSWORD`
+
+Also set:
+
+- `SPRING_PROFILES_ACTIVE=docker`
+
+### 3) `prod` (external injection only)
+
+Used by `application-prod.properties`.
+
+Required:
+
+- `DB_URL` (full JDBC URL)
+- `DB_USER`
+- `DB_PASSWORD`
+
+Optional tuning (with defaults matching the properties file):
+
+- `DB_MAX_POOL_SIZE` (default: 30)
+- `DB_MIN_IDLE` (default: 10)
+- `DB_MAX_LIFETIME` (default: 1800000)
+- `DB_TIMEOUT` (default: 30000)
+- `THREAD_CORE` (default: 8)
+- `THREAD_MAX` (default: 16)
+- `THREAD_QUEUE` (default: 200)
+- `THREAD_KEEPALIVE` (default: 60000)
+
+---
+
+# 🧑‍💻 Development Setup
+
+## Option 1: Run Locally (VS Code / Maven dev mode)
+
+### A: Using VS Code (Recommended)
+
+1. Open the project folder in VS Code.
+2. Use the Spring Boot Dashboard.
+3. Click **Run / Debug** on the `user-service` application.
+
+### B: Using Terminal (Maven)
+
+1. Start a MySQL database locally.
+2. Ensure your `.env` file contains the required `DB_USERNAME` and `DB_PASSWORD`.
+3. Run:
+
+```bash
+mvn clean compile
+mvn spring-boot:run
 ```
-  mvn clean compile
+
+---
+
+## Option 2: Run Using Docker Container (profile: docker)
+
+This mode uses `application-docker.properties` and expects the app to connect to a MySQL instance via `DB_HOST`, `DB_USERNAME`, and `DB_PASSWORD`.
+
+### Step 1: Build the JAR
+
+```bash
+mvn clean package -DskipTests
 ```
 
-Start and configure your MariaDB development server.
-See https://mariadb.com/kb/en/getting-installing-and-upgrading-mariadb/ for more info.
+### Step 2: Build the Docker image
 
-Run the Spring application
-
-## Deployment along with mariadb container
-
-Follow this steps to deploy the project on your server
-
-1. Set `ACTIVE_PROFILE` into this:
-
-```
-ACTIVE_PROFILE=prod
-
+```bash
+docker build --no-cache -t user-service .
 ```
 
-2. Run this on project directory
+### Step 3: Start the container
 
-```
-mvn clean package -Dmaven.test.skip=true
+Example (MySQL on the same Docker network):
 
-```
-
-3. Run this to create and deploy containers
-
-```
-sudo docker compose -f docker-compose.yaml up --build
-
-```
-
-## Deployment with User Service container only
-
-Follow this steps to deploy the project on your server
-
-1. Set application.properties into this:
-
-```
-spring.profiles.active=prod
-
+```bash
+docker run -d --name user-service \
+  -p 8081:8081 \
+  -e DB_HOST=mysql \
+  -e DB_USERNAME=root \
+  -e DB_PASSWORD=secret \
+  -e SPRING_PROFILES_ACTIVE=docker \
+  -e JWT_SECRET=REPLACE_ME_WITH_BASE64 \
+  -e JWT_EXPIRATION=3600000 \
+  user-service
 ```
 
-2. Run this on project directory
+JWT secret notes:
 
+- `JwtUtil` expects properties `JWT.SECRET` and `JWT.EXPIRATION`.
+- Because this runs in Docker without changing source code, provide them via env vars:
+  - `JWT_SECRET` -> `JWT.SECRET`
+  - `JWT_EXPIRATION` -> `JWT.EXPIRATION`
+- `JWT.SECRET` must be **Base64-encoded**, since `JwtUtil` does `Decoders.BASE64.decode(secret)`.
+
+If MySQL is reachable from the host, `DB_HOST` should be set accordingly (e.g., `host.docker.internal`).
+
+---
+
+## Option 3: Run in Production Mode (external database)
+
+This mode uses `application-prod.properties` (JPA validation, production-safe logging).
+
+### Step 1: Build the JAR
+
+```bash
+mvn clean package -DskipTests
 ```
-mvn clean package -Dmaven.test.skip=true
 
+### Step 2: Run with prod profile
+
+```bash
+java -jar target/user-service.jar --spring.profiles.active=prod
 ```
 
-3. Run this to create and deploy containers
+### Docker example (prod)
 
+```bash
+docker run -d --name user-service-prod \
+  -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e DB_URL=jdbc:mysql://external-host:3306/user_service \
+  -e DB_USER=your_user \
+  -e DB_PASSWORD=your_password \
+  user-service
 ```
-sudo docker compose -f docker-compose-service-only.yaml up --build
 
-```
+---
 
-# API Endpoints
+# 🧪 API Testing (Bruno)
 
-Go to https://voltesiv.postman.co/workspace/954c2fe7-c7cc-4b73-9ea5-8fda4e20efd7 to see test API Endpoints.
+- Open Bruno
+- Import the `user-service-api-tests` collection
+- Set environment variables in Bruno
+- Send requests to:
 
-Stay tuned for futher updates!
+http://localhost:8081
+
+---
+
+# 🧠 Important Notes
+
+- Requires Java 17
+- Profile-specific configuration is important (`dev` / `docker` / `prod`)
+- `dev` loads `.env` from the project root
+- `docker` expects `DB_HOST` to be resolvable from the container network
+- `prod` uses external JDBC injection (`DB_URL`, `DB_USER`, `DB_PASSWORD`)
+- Uses HikariCP for DB performance
+- REST API microservice (no frontend)
+
+---
+
+# 🔥 Summary
+
+- Spring Boot REST API microservice
+- Java 17 required
+- VS Code supported
+- Bruno for API testing
+- Docker run instructions included
+- MySQL-backed persistence

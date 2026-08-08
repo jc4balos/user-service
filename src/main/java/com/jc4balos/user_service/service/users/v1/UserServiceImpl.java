@@ -1,6 +1,7 @@
 package com.jc4balos.user_service.service.users.v1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,9 +25,13 @@ import com.jc4balos.user_service.dto.request.user.ChangePasswordDto;
 import com.jc4balos.user_service.dto.request.user.LoginDto;
 import com.jc4balos.user_service.dto.request.user.ModifyUserInfoDto;
 import com.jc4balos.user_service.dto.request.user.NewUserDto;
+import com.jc4balos.user_service.dto.response.role.ViewRoleDto;
+import com.jc4balos.user_service.dto.response.user.LoginResponseDto;
 import com.jc4balos.user_service.dto.response.user.UserCredentialsDto;
 import com.jc4balos.user_service.dto.response.user.ViewUserDto;
+import com.jc4balos.user_service.mapper.role_mapper.RoleMapper;
 import com.jc4balos.user_service.mapper.user_mapper.UserMapper;
+import com.jc4balos.user_service.model.Role;
 import com.jc4balos.user_service.model.RoleAssignment;
 import com.jc4balos.user_service.model.User;
 import com.jc4balos.user_service.repository.RoleAssignmentRepository;
@@ -50,6 +55,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -104,8 +112,21 @@ public class UserServiceImpl implements UserService {
         Pageable pageAndSort = PageRequest.of(pageIndex, itemsPerPage, sort);
         Page<User> users = userRepository.findBySearchParam(searchParam, pageAndSort);
 
+        List<Long> userIDs = users.getContent().stream().map(User::getUserId).toList();
+        Map<Long, List<ViewRoleDto>> rolesByUserID = new HashMap<>();
+
+        if (!userIDs.isEmpty()) {
+            List<RoleAssignment> roleAssignments = roleAssignmentRepository.findByUserIdsWithActiveRoles(userIDs);
+
+            for (RoleAssignment roleAssignment : roleAssignments) {
+                rolesByUserID.computeIfAbsent(roleAssignment.getUser().getUserId(), key -> new ArrayList<>())
+                        .add(roleMapper.viewRoleDto(roleAssignment.getRole()));
+            }
+        }
+
         for (User user : users) {
             ViewUserDto mappedUser = userMapper.viewUserDto(user);
+            mappedUser.setRoles(rolesByUserID.getOrDefault(user.getUserId(), new ArrayList<>()));
             viewUserDtos.add(mappedUser);
         }
 
@@ -221,13 +242,42 @@ public class UserServiceImpl implements UserService {
             return CompletableFuture.completedFuture(response);
         }
 
-        List<RoleAssignment> roleAssignment = roleAssignmentRepository.findByUser(optionalUser);
+        List<Role> userRoles = roleAssignmentRepository.findRolesByUser(optionalUser.getUserId());
+
+        System.out.println("ROLES: " + userRoles);
+
+        List<String> roleKeys = new ArrayList<>();
+        List<String> roleUUIDs = new ArrayList<>();
+        for (Role role : userRoles) {
+            roleKeys.add(role.getRoleKey());
+            roleUUIDs.add(role.getRoleUUID());
+        }
 
         String token = jwtUtil.generateToken(optionalUser,
-                roleAssignment.stream().map(RoleAssignment::getRole).toList());
+                roleKeys, roleUUIDs);
 
-        ResponseEntity<?> response = ResponseEntity.ok().header("Authorization", "Bearer " + token)
-                .body(Map.of("message", "Login successful."));
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+                .message("Login successful.")
+                .token(token)
+                .build();
+
+        ResponseEntity<?> response = ResponseEntity.ok().body(loginResponseDto);
+        return CompletableFuture.completedFuture(response);
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<ResponseEntity<?>> getUserByUUID(String userUUID) {
+        User optionalUser = userRepository.findByUserUUID(userUUID);
+
+        if (optionalUser == null) {
+            Map<String, String> data = Map.of("message", "User doesn't exist.");
+            ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+            return CompletableFuture.completedFuture(response);
+        }
+
+        ViewUserDto userCredentialsDto = userMapper.viewUserDto(optionalUser);
+        ResponseEntity<?> response = new ResponseEntity<>(userCredentialsDto, HttpStatus.OK);
         return CompletableFuture.completedFuture(response);
     }
 

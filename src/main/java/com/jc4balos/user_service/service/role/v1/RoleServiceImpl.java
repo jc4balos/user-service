@@ -1,6 +1,7 @@
 package com.jc4balos.user_service.service.role.v1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -57,6 +58,14 @@ public class RoleServiceImpl implements RoleService {
 
         Role newRole = roleMapper.newRoleDto(newRoleDto);
 
+        if (roleRepository.existsByRoleKey(newRoleDto.getRoleKey())) {
+            throw new RuntimeException("Role key already used.");
+        }
+
+        if (roleRepository.existsByRoleName(newRoleDto.getRoleName())) {
+            throw new RuntimeException("Role name already used.");
+        }
+
         roleRepository.save(newRole);
         String message = "Role " + newRole.getRoleName() + " created successfully.";
         logger.info(message);
@@ -95,7 +104,7 @@ public class RoleServiceImpl implements RoleService {
 
         Map<String, Object> data = Map.of("pageIndex", roles.getNumber(),
                 "totalPages", roles.getTotalPages(),
-                "users", viewRoleDtos);
+                "roles", viewRoleDtos);
 
         ResponseEntity<?> response = new ResponseEntity<>(data, HttpStatus.OK);
 
@@ -112,7 +121,7 @@ public class RoleServiceImpl implements RoleService {
             throw new RuntimeException("Role doesn't exist.");
         }
 
-        thisRole = roleMapper.newRoleDto(newRoleDto);
+        roleMapper.updateRoleFromDto(thisRole, newRoleDto);
         roleRepository.save(thisRole);
 
         String message = "Role " + thisRole.getRoleName() + " successfully modified.";
@@ -136,6 +145,16 @@ public class RoleServiceImpl implements RoleService {
             throw new RuntimeException("User doesn't exist.");
         }
 
+        if (roleAssignmentRepository.existsByUserAndRole(thisUser, thisRole)) {
+            String alreadyAssignedMessage = "The user has already been assigned the role '" + thisRole.getRoleName()
+                    + "'.";
+            logger.warn("User '" + thisUser.getUsername() + "' already has the role '" + thisRole.getRoleName()
+                    + "'. Duplicate assignment prevented.");
+            ResponseEntity<?> response = new ResponseEntity<>(Map.of("message", alreadyAssignedMessage),
+                    HttpStatus.CONFLICT);
+            return CompletableFuture.completedFuture(response);
+        }
+
         RoleAssignment newRoleAssignment = roleAssignmentMapper.newRoleAssignment(thisRole, thisUser);
         roleAssignmentRepository.save(newRoleAssignment);
 
@@ -147,15 +166,83 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public CompletableFuture<ResponseEntity<?>> deactivateRole() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deactivateRole'");
+    @Async
+    @Transactional
+    public CompletableFuture<ResponseEntity<?>> deactivateRole(String roleUUID) {
+        Role thisRole = roleRepository.findByRoleUUID(roleUUID);
+
+        if (thisRole == null) {
+            throw new RuntimeException("Role doesn't exist.");
+        }
+
+        if (Boolean.FALSE.equals(thisRole.getIsActive())) {
+            throw new RuntimeException("Role is already inactive.");
+        }
+
+        thisRole.setIsActive(false);
+        roleRepository.save(thisRole);
+
+        String message = "Role " + thisRole.getRoleName() + " successfully deactivated.";
+        logger.info(message);
+        ResponseEntity<?> response = new ResponseEntity<>(Map.of("message", message), HttpStatus.OK);
+        return CompletableFuture.completedFuture(response);
     }
 
     @Override
+    @Async
+    @Transactional
     public CompletableFuture<ResponseEntity<?>> removeRole(String userUUID, String roleUUID) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removeRole'");
+        User thisUser = userRepository.findByUserUUID(userUUID);
+        Role thisRole = roleRepository.findByRoleUUID(roleUUID);
+
+        if (thisUser == null) {
+            throw new RuntimeException("User doesn't exist.");
+        }
+
+        if (thisRole == null) {
+            throw new RuntimeException("Role doesn't exist.");
+        }
+
+        RoleAssignment roleAssignment = roleAssignmentRepository.findByUserAndRole(thisUser, thisRole);
+        if (roleAssignment == null) {
+            throw new RuntimeException("User doesn't have this role.");
+        }
+
+        roleAssignmentRepository.delete(roleAssignment);
+
+        String message = "Role " + thisRole.getRoleName() + " successfully removed from "
+                + thisUser.getFirstName() + " " + thisUser.getFatherSurname() + " "
+                + thisUser.getHusbandSurname() + ".";
+        logger.info(message);
+        ResponseEntity<?> response = new ResponseEntity<>(Map.of("message", message), HttpStatus.OK);
+        return CompletableFuture.completedFuture(response);
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<ResponseEntity<?>> getRolesFromUser(String userUUID) {
+
+        User thisUser = userRepository.findByUserUUID(userUUID);
+        if (thisUser == null) {
+            throw new RuntimeException("User doesn't exist.");
+        }
+
+        List<RoleAssignment> roleAssignments = roleAssignmentRepository.findByUser(thisUser);
+
+        List<ViewRoleDto> viewRoleDtos = new ArrayList<>();
+        for (RoleAssignment ra : roleAssignments) {
+            ViewRoleDto mappedRole = roleMapper.viewRoleDto(ra.getRole());
+            viewRoleDtos.add(mappedRole);
+        }
+
+        logger.info("Retrieved assigned roles for user {}.", thisUser.getUsername());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("userUUID", thisUser.getUserUUID());
+        response.put("roles", viewRoleDtos);
+
+        return CompletableFuture.completedFuture(new ResponseEntity<>(response, HttpStatus.OK));
     }
 
 }
