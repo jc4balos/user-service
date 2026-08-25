@@ -172,6 +172,21 @@ JWT secret notes:
 
 If MySQL is reachable from the host, `DB_HOST` should be set accordingly (e.g., `host.docker.internal`).
 
+Add this line to make host.docker.internal available inside the container:
+
+**docker run:**
+```bash
+--add-host=host.docker.internal:host-gateway
+```
+ 
+**docker-compose.yml:**
+```yaml
+extra_hosts:
+  - "host.docker.internal:host-gateway"
+```
+
+Requires Docker Engine 20.10+.
+
 ---
 
 ## Option 3: Run in Production Mode (external database)
